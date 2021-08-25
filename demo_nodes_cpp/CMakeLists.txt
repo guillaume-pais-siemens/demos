@@ -28,6 +28,7 @@ function(custom_executable subfolder target)
     "rclcpp"
     "rcutils"
     "std_msgs")
+  target_link_libraries(${target} -latomic)
   install(TARGETS ${target}
   DESTINATION lib/${PROJECT_NAME})
 endfunction()
@@ -41,6 +42,7 @@ function(add_demo_dependencies library)
     "rclcpp_components"
     "rcutils"
     "std_msgs")
+  target_link_libraries(${library} -latomic)
 endfunction()
 # Tutorials of Publish/Subscribe with Topics
 custom_executable(topics allocator_tutorial)
