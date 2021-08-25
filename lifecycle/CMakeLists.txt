@@ -42,6 +42,7 @@ add_executable(lifecycle_service_client
 target_link_libraries(lifecycle_service_client
   ${rclcpp_lifecycle_LIBRARIES}
   ${std_msgs_LIBRARIES}
+  -latomic
 )
 
 install(TARGETS
