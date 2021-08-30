@@ -30,6 +30,19 @@ function(qos_demo_executable target)
     "rcutils"
     "std_msgs"
   )
+
+  if (CMAKE_GENERATOR_PLATFORM)
+    set (TARGET_ARCH "${CMAKE_GENERATOR_PLATFORM}")
+  else ()
+    set (TARGET_ARCH "${CMAKE_SYSTEM_PROCESSOR}")
+  endif ()
+
+  if (CMAKE_COMPILER_IS_GNUCXX AND TARGET_ARCH MATCHES "^(riscv|RISCV)64$")
+  # using GCC, libatomic is not automatically linked for RISC-V
+      target_link_libraries(${target} -latomic)
+  endif ()
+
+#  target_link_libraries(${target} -latomic)
   install(TARGETS ${target} DESTINATION lib/${PROJECT_NAME})
 endfunction()
 
