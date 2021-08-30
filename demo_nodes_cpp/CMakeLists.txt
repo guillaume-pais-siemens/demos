@@ -11,6 +11,12 @@ if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
   add_compile_options(-Wall -Wextra -Wpedantic)
 endif()
 
+if (CMAKE_GENERATOR_PLATFORM)
+  set (TARGET_ARCH "${CMAKE_GENERATOR_PLATFORM}")
+else ()
+  set (TARGET_ARCH "${CMAKE_SYSTEM_PROCESSOR}")
+endif ()
+
 find_package(ament_cmake REQUIRED)
 find_package(example_interfaces REQUIRED)
 find_package(rclcpp REQUIRED)
@@ -28,7 +34,10 @@ function(custom_executable subfolder target)
     "rclcpp"
     "rcutils"
     "std_msgs")
-  target_link_libraries(${target} -latomic)
+  if (CMAKE_COMPILER_IS_GNUCXX AND TARGET_ARCH MATCHES "^(riscv|RISCV)64$")
+    # using GCC, libatomic is not automatically linked for RISC-V
+    target_link_libraries(${target} -latomic)
+  endif ()
   install(TARGETS ${target}
   DESTINATION lib/${PROJECT_NAME})
 endfunction()
@@ -42,7 +51,10 @@ function(add_demo_dependencies library)
     "rclcpp_components"
     "rcutils"
     "std_msgs")
-  target_link_libraries(${library} -latomic)
+  if (CMAKE_COMPILER_IS_GNUCXX AND TARGET_ARCH MATCHES "^(riscv|RISCV)64$")
+    # using GCC, libatomic is not automatically linked for RISC-V
+    target_link_libraries(${library} -latomic)
+  endif ()
 endfunction()
 # Tutorials of Publish/Subscribe with Topics
 custom_executable(topics allocator_tutorial)

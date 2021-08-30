@@ -42,8 +42,18 @@ add_executable(lifecycle_service_client
 target_link_libraries(lifecycle_service_client
   ${rclcpp_lifecycle_LIBRARIES}
   ${std_msgs_LIBRARIES}
-  -latomic
 )
+
+if (CMAKE_GENERATOR_PLATFORM)
+  set (TARGET_ARCH "${CMAKE_GENERATOR_PLATFORM}")
+else ()
+  set (TARGET_ARCH "${CMAKE_SYSTEM_PROCESSOR}")
+endif ()
+
+if (CMAKE_COMPILER_IS_GNUCXX AND TARGET_ARCH MATCHES "^(riscv|RISCV)64$")
+  # using GCC, libatomic is not automatically linked for RISC-V
+  target_link_libraries(lifecycle_service_client -latomic)
+endif ()
 
 install(TARGETS
   lifecycle_talker
